@@ -8,5 +8,12 @@
     "Tvůj bezoční smích je zbytečně až mooc cute.",
     "Jsi cílevědomá způsobem, který mě dokáže vždycky překvapit.",
     "I na dálku cítím, jak moc mě máš ráda. Kdo to může říct .."
-  ]
+  ],
+  "prekvapeni": {
+    "3": {
+      "emoji": "🍉",
+      "tlacitko": "Překvapení ♥",
+      "text": "Dnes je mezinárodní den melounu. Ty jsi šťavnatá jako ten nejsladší meloun."
+    }
+  }
 }
