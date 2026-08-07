@@ -7,13 +7,25 @@
     "S tebou má i obyčejné ticho a dívání se z očí do očí smysl.",
     "Tvůj bezoční smích je zbytečně až mooc cute.",
     "Jsi cílevědomá způsobem, který mě dokáže vždycky překvapit.",
-    "I na dálku cítím, jak moc mě máš ráda. Kdo to může říct .."
+    "I na dálku cítím, jak moc mě máš ráda. Kdo to může říct ..",
+    "Máš srdce, které miluje více, než kdy dáš najevo.",
+    "Sofča, sladká jako kolča. Už se těším až ji budu pít.",
+    "Kdyby všechny holky na světě byly alespoň z poloviny tak sexy jako ty. Neexistujou žádní buzeranti.",
+    "Baví mě jak u tebe není nic žádný problém!",
+    "Tvůj pas a zadek je jediná věc na světě, která mě nechává speechless. A ty moc dobře víš, že mi slova nikdy nedojdou.",
+    "Miluju, jak se ti rozzáří oči, když vyprávíš o něčem, co máš ráda nebo tě baví.",
+    "Jsi tak krásná, že ti sluší i roztrhané tepláky."
   ],
   "prekvapeni": {
     "3": {
       "emoji": "🍉",
       "tlacitko": "Překvapení ♥",
       "text": "Dnes je mezinárodní den melounu. Ty jsi šťavnatá jako ten nejsladší meloun."
+    },
+    "8": {
+      "emoji": "🐱",
+      "tlacitko": "Překvapení ♥",
+      "text": "Dnes je mezinárodní den koček, ale tu největší kočičku mám já!"
     }
   }
 }
