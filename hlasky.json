@@ -14,7 +14,15 @@
     "Baví mě jak u tebe není nic žádný problém!",
     "Tvůj pas a zadek je jediná věc na světě, která mě nechává speechless. A ty moc dobře víš, že mi slova nikdy nedojdou.",
     "Miluju, jak se ti rozzáří oči, když vyprávíš o něčem, co máš ráda nebo tě baví.",
-    "Jsi tak krásná, že ti sluší i roztrhané tepláky."
+    "Jsi tak krásná, že ti sluší i roztrhané tepláky.",
+    "I am not Arctic Monkeys, but I wanna be yours.",
+    "Tvoje objetí je jediné místo, kam se chci vracet.",
+    "Přes všechny moje mikro uražení mě stále miluješ. Děkujuuu.",
+    "Tvé vzdychání u sexu je jako moje oblíbená písnička, mohl bych to poslouchat pořád dokola.",
+    "Jsi nejstatečnější holka, kterou znám! A k tomu ještě moje holka.. jupííí!",
+    "Miluju a zároveň nesnáším tvou voňavku, když ti líbám krk.",
+    "Zatím mi chybíš jen každou vteřinu :) Moc se na tebe těším, na tvoji vůni, na tvoje pusinky, hlazení, objímání a vagínu.",
+    "Dnes je to třicet dnů, co jsme od sebe. Budeš mít malé překvapení, ale nebude zadarmo."
   ],
   "prekvapeni": {
     "3": {
@@ -26,6 +34,18 @@
       "emoji": "🐱",
       "tlacitko": "Překvapení ♥",
       "text": "Dnes je mezinárodní den koček, ale tu největší kočičku mám já!"
+    }
+  },
+  "kvizy": {
+    "22": {
+      "tlacitko": "Jdu do toho!",
+      "otazka": "Kdy jsem se narodil?",
+      "napoveda": "např. 3.5.2002",
+      "spravne": ["22.3.2000", "22032000"],
+      "spravne_hlaska": "Správně! ♥",
+      "spatne_hlaska": "Skoro... zkus to znovu ♥",
+      "foto": "foto-den22.jpg",
+      "odmena_text": "Miluju tě"
     }
   }
 }

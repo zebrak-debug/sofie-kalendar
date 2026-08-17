@@ -165,6 +165,19 @@
   }
   .surprise-text.show{max-height:300px;opacity:1;}
 
+  .quiz-box{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .5s ease,margin .5s ease;margin-top:0;}
+  .quiz-box.show{max-height:280px;opacity:1;margin-top:10px;}
+  .quiz-q{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(18px,3.4vw,22px);color:var(--rose-deep);margin:0 0 16px;}
+  #quiz-answer{width:100%;box-sizing:border-box;padding:13px 16px;font-family:'Jost',sans-serif;font-size:16px;text-align:center;color:var(--ink);background:#fff;border:1.5px solid #f0bccb;border-radius:14px;outline:none;transition:border-color .3s;}
+  #quiz-answer:focus{border-color:var(--rose);}
+  .quiz-check{margin-top:14px;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,var(--rose),var(--rose-deep));padding:12px 30px;border-radius:99px;box-shadow:0 8px 20px rgba(184,71,106,.3);transition:transform .2s;}
+  .quiz-check:hover{transform:translateY(-2px);}
+  .quiz-hint{min-height:20px;margin:12px 0 0;font-family:'Jost',sans-serif;font-size:14px;color:#c0607e;}
+  .quiz-reward{max-height:0;overflow:hidden;opacity:0;transition:max-height .7s ease,opacity .7s ease,margin .7s ease;margin-top:0;}
+  .quiz-reward.show{max-height:900px;opacity:1;margin-top:22px;}
+  .quiz-img{width:100%;border-radius:18px;border:1px solid #f0bccb;display:block;}
+  .quiz-reward-text{font-family:'Cormorant Garamond',serif;font-weight:500;font-style:italic;font-size:clamp(20px,4vw,26px);line-height:1.4;color:var(--rose-deep);margin:20px 0 0;}
+
   .fly-emoji{position:fixed;pointer-events:none;z-index:80;will-change:transform;user-select:none;}
   .petal{position:fixed;top:-30px;font-size:18px;color:var(--rose);pointer-events:none;z-index:70;opacity:.9;will-change:transform;}
 </style>
@@ -191,6 +204,19 @@
       <p class="msg" id="msg"></p>
       <button class="surprise" id="surprise" style="display:none">Překvapení ♥</button>
       <p class="surprise-text" id="surprise-text"></p>
+
+      <button class="surprise" id="quiz-start" style="display:none">Jdu do toho!</button>
+      <div id="quiz" class="quiz-box">
+        <p class="quiz-q" id="quiz-q"></p>
+        <input id="quiz-answer" type="text" inputmode="numeric" placeholder="" autocomplete="off" />
+        <button id="quiz-check" class="quiz-check">Potvrdit</button>
+        <p class="quiz-hint" id="quiz-hint"></p>
+      </div>
+      <div id="quiz-reward" class="quiz-reward">
+        <img id="quiz-img" class="quiz-img" alt="" />
+        <p class="quiz-reward-text" id="quiz-reward-text"></p>
+      </div>
+
       <p class="sign">— tvůj Bambínek</p>
       <button class="close" id="close">Zavřít</button>
     </div>
@@ -214,6 +240,17 @@ let SURPRISES = {};
 
 const surpriseBtn = document.getElementById('surprise');
 const surpriseText = document.getElementById('surprise-text');
+let QUIZZES = {};
+const quizStart = document.getElementById('quiz-start');
+const quizBox = document.getElementById('quiz');
+const quizQ = document.getElementById('quiz-q');
+const quizAnswer = document.getElementById('quiz-answer');
+const quizCheck = document.getElementById('quiz-check');
+const quizHint = document.getElementById('quiz-hint');
+const quizReward = document.getElementById('quiz-reward');
+const quizImg = document.getElementById('quiz-img');
+const quizRewardText = document.getElementById('quiz-reward-text');
+let activeQuiz = null;
 
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function todayIndex(){return Math.floor((midnight(new Date())-midnight(START_DATE))/86400000);}
@@ -230,6 +267,7 @@ fetch('hlasky.json?v='+Date.now())
     START_DATE=new Date(+parts[0], +parts[1]-1, +parts[2]);
     COMPLIMENTS=data.hlasky||[];
     SURPRISES=data.prekvapeni||{};
+    QUIZZES=data.kvizy||{};
     build();
   })
   .catch(err=>{
@@ -291,6 +329,29 @@ function openWindow(i,cell,opened){
     surpriseBtn.onclick=null;
   }
 
+  // Reset kvízu a nastavení, pokud pro tento den existuje
+  quizBox.classList.remove('show');
+  quizReward.classList.remove('show');
+  quizAnswer.value='';
+  quizHint.textContent='';
+  const q = QUIZZES[i+1];
+  if(q){
+    activeQuiz = q;
+    quizStart.style.display='inline-block';
+    quizStart.textContent = q.tlacitko || 'Jdu do toho!';
+    quizQ.textContent = q.otazka || '';
+    quizAnswer.placeholder = q.napoveda || '';
+    quizStart.onclick = ()=>{
+      quizStart.style.display='none';
+      quizBox.classList.add('show');
+      quizAnswer.focus();
+    };
+  } else {
+    activeQuiz = null;
+    quizStart.style.display='none';
+    quizStart.onclick=null;
+  }
+
   overlay.classList.add('show');
   if(!opened.includes(i)){
     opened.push(i);setOpened(opened);
@@ -324,10 +385,51 @@ function flyEmoji(emoji){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');}
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
+
+// Kontrola odpovědi v kvízu — porovnává jen číslice, takže projdou všechny zápisy data
+function normDigits(s){return (s||'').replace(/\D/g,'');}
+function checkQuiz(){
+  if(!activeQuiz) return;
+  const given = normDigits(quizAnswer.value);
+  const accepted = (activeQuiz.spravne || []).map(normDigits);
+  if(accepted.includes(given) && given!==''){
+    quizHint.style.color='#3c9a6a';
+    quizHint.textContent = activeQuiz.spravne_hlaska || 'Správně! ♥';
+    heartsBurst();
+    if(activeQuiz.foto){ quizImg.src = activeQuiz.foto; quizImg.style.display='block'; }
+    else { quizImg.style.display='none'; }
+    quizRewardText.textContent = activeQuiz.odmena_text || '';
+    setTimeout(()=>{
+      quizBox.classList.remove('show');
+      quizReward.classList.add('show');
+    }, 550);
+  } else {
+    quizHint.style.color='#c0607e';
+    quizHint.textContent = activeQuiz.spatne_hlaska || 'Skoro... zkus to znovu ♥';
+    quizAnswer.style.borderColor='#e26d8a';
+    setTimeout(()=>{quizAnswer.style.borderColor='#f0bccb';},600);
+  }
+}
+quizCheck.addEventListener('click',checkQuiz);
+quizAnswer.addEventListener('keydown',e=>{if(e.key==='Enter')checkQuiz();});
+
+function heartsBurst(){
+  for(let k=0;k<22;k++){
+    const e=document.createElement('div');
+    e.className='fly-emoji';e.textContent='💖';
+    e.style.fontSize=(20+Math.random()*26)+'px';
+    e.style.left=(Math.random()*100)+'vw';e.style.top='110vh';
+    document.body.appendChild(e);
+    const dx=(Math.random()*40-20),rot=Math.random()*720-360,dur=1.4+Math.random()*1.3,dl=Math.random()*0.4;
+    e.style.transition='transform '+dur+'s cubic-bezier(.25,.8,.3,1) '+dl+'s, opacity '+dur+'s linear '+dl+'s';
+    requestAnimationFrame(()=>{e.style.transform='translate('+dx+'vw,-150vh) rotate('+rot+'deg)';e.style.opacity='0';});
+    setTimeout(()=>e.remove(),(dur+dl)*1000+150);
+  }
+}
 
 function updateProgress(){
   const n=getOpened().length;
