@@ -29,24 +29,24 @@
     "Dnešní předpověď ukazuje, že je 100% šance, že mi budeš chybět.",
     "Dnes je mezinárodní den jezer. Těším se až budeš mokrá tak, že budu v tobě plavat jako v jezeru.",
     "Tvoje rty jsou pro mě závislost jako cigareta, která se nedá nikdy dokouřit.",
-    "Jestli ti je smutno, mysli na to, že jsi něčí (můj) důvod k masturbaci."
+    "Jestli ti je smutno, mysli na to, že jsi něčí (můj) důvod k masturbaci.",
+    "I po takové době se přistihnu, jak se pokaždé usmívám do telefonu jako blázen, když mi píšeš.",
+    "Tvoje nohy jsou jako Oreo, chci je oddělit a vylízat střed.",
+    "Kdybych chytl zlatou rybičku a dostal od ní tři přání, přál bych si holku 10/10 — a stále bych měl tři přání.",
+    "Asi jsem úplně blbej, ale dneska jsou Vánoce ne? Protože ti přijede dáreček s pořádnou nadílkou! Budu tě dneska strašně moc šukat, jako malou děvku a vystříkám se ti na každou část tvého těla! Nejsem básník, ale kdybych byl, každá báseň by končila stejně: a pak jsem konečně přijel za tebou.",
+    "Kdybys byla v Upířích denících, Damon by měl poprvé v životě konkurenci… protože kvůli tobě bych klidně přešel na temnou stranu.",
+    "Kdyby existoval olympijský sport lásky, mám doma zlato ve všech disciplínách.",
+    "Nejvíce hot těleso ve vesmíru není slunce, ale ty!",
+    "Přiznávám: půlku času přemýšlím o tvém bříšku a druhou půlku o tvým zadku. A upřímně, nemá to vítěze.",
+    "Vzbuď se a koukni se ven, je ráno, je ráno Anno, vzbuď se a koukni se ven. Takhle šťastné to dneska asi nebude, ale nesmíme zapomínat na to, že máme před sebou celých 6 let (možná více). Další měsíc zvládneme.",
+    "Neplakej moje překrásná holčičko, za chvíli se zase uvidíme a budeme spolu dělat všechny ty věci, o kterých už zase sníme. Miluju tě.",
+    "Dnes je mezinárodní den polibku. Snad si jich spolu ještě užijeme mraky. A upusinkujeme se k smrti."
   ],
   "prekvapeni": {
-    "3": {
-      "emoji": "🍉",
-      "tlacitko": "Překvapení ♥",
-      "text": "Dnes je mezinárodní den melounu. Ty jsi šťavnatá jako ten nejsladší meloun."
-    },
-    "8": {
-      "emoji": "🐱",
-      "tlacitko": "Překvapení ♥",
-      "text": "Dnes je mezinárodní den koček, ale tu největší kočičku mám já!"
-    },
-    "27": {
-      "emoji": "🌊",
-      "tlacitko": "Překvapení ♥",
-      "text": "Dnes je mezinárodní den jezer. Těším se až budeš mokrá tak, že budu v tobě plavat jako v jezeru."
-    }
+    "3": { "emoji": "🍉", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den melounu. Ty jsi šťavnatá jako ten nejsladší meloun." },
+    "8": { "emoji": "🐱", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den koček, ale tu největší kočičku mám já!" },
+    "27": { "emoji": "🌊", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den jezer. Těším se až budeš mokrá tak, že budu v tobě plavat jako v jezeru." },
+    "40": { "emoji": "💋", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den polibku. Snad si jich spolu ještě užijeme mraky. A upusinkujeme se k smrti." }
   },
   "kvizy": {
     "22": {
@@ -59,5 +59,10 @@
       "foto": "foto-den22.jpg",
       "odmena_text": "Miluju tě"
     }
+  },
+  "odpocty": {
+    "31": { "cil": "2026-09-02T12:25", "popisek": "Než za tebou přijedu", "hotovo_text": "Už jsem tu ♥" },
+    "32": { "cil": "2026-09-02T12:25", "popisek": "Než za tebou přijedu", "hotovo_text": "Už jsem tu ♥" },
+    "33": { "cil": "2026-09-02T12:25", "popisek": "Než za tebou přijedu", "hotovo_text": "Už jsem tu ♥" }
   }
 }
