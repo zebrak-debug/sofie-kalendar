@@ -178,6 +178,14 @@
   .quiz-img{width:100%;border-radius:18px;border:1px solid #f0bccb;display:block;}
   .quiz-reward-text{font-family:'Cormorant Garamond',serif;font-weight:500;font-style:italic;font-size:clamp(20px,4vw,26px);line-height:1.4;color:var(--rose-deep);margin:20px 0 0;}
 
+  .cd-wrap{margin-top:26px;padding:20px 16px;border-radius:18px;background:linear-gradient(135deg,#ffe3ec,#ffd0de);border:1px solid #f3c0d0;}
+  .cd-label{font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--rose-deep);opacity:.85;margin-bottom:12px;}
+  .cd-boxes{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+  .cd-box{min-width:58px;background:#fff;border-radius:12px;padding:10px 6px;box-shadow:0 4px 10px rgba(184,71,106,.12);}
+  .cd-num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--rose-deep);line-height:1;}
+  .cd-unit{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px;}
+  .cd-done{display:none;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:var(--rose-deep);}
+
   .fly-emoji{position:fixed;pointer-events:none;z-index:80;will-change:transform;user-select:none;}
   .petal{position:fixed;top:-30px;font-size:18px;color:var(--rose);pointer-events:none;z-index:70;opacity:.9;will-change:transform;}
 </style>
@@ -217,6 +225,12 @@
         <p class="quiz-reward-text" id="quiz-reward-text"></p>
       </div>
 
+      <div id="countdown" class="cd-wrap" style="display:none">
+        <div class="cd-label" id="cd-label">Než za tebou přijedu</div>
+        <div class="cd-boxes" id="cd-boxes"></div>
+        <div class="cd-done" id="cd-done"></div>
+      </div>
+
       <p class="sign">— tvůj Bambínek</p>
       <button class="close" id="close">Zavřít</button>
     </div>
@@ -251,6 +265,12 @@ const quizReward = document.getElementById('quiz-reward');
 const quizImg = document.getElementById('quiz-img');
 const quizRewardText = document.getElementById('quiz-reward-text');
 let activeQuiz = null;
+let COUNTDOWNS = {};
+let cdTimer = null;
+const countdownWrap = document.getElementById('countdown');
+const cdLabel = document.getElementById('cd-label');
+const cdBoxes = document.getElementById('cd-boxes');
+const cdDone = document.getElementById('cd-done');
 
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function todayIndex(){return Math.floor((midnight(new Date())-midnight(START_DATE))/86400000);}
@@ -268,6 +288,7 @@ fetch('hlasky.json?v='+Date.now())
     COMPLIMENTS=data.hlasky||[];
     SURPRISES=data.prekvapeni||{};
     QUIZZES=data.kvizy||{};
+    COUNTDOWNS=data.odpocty||{};
     build();
   })
   .catch(err=>{
@@ -352,6 +373,17 @@ function openWindow(i,cell,opened){
     quizStart.onclick=null;
   }
 
+  // Reset a nastavení odpočtu, pokud pro tento den existuje
+  if(cdTimer){clearInterval(cdTimer);cdTimer=null;}
+  const cdConf = COUNTDOWNS[i+1];
+  if(cdConf){
+    countdownWrap.style.display='block';
+    cdLabel.textContent = cdConf.popisek || 'Než za tebou přijedu';
+    startCountdown(cdConf);
+  } else {
+    countdownWrap.style.display='none';
+  }
+
   overlay.classList.add('show');
   if(!opened.includes(i)){
     opened.push(i);setOpened(opened);
@@ -385,7 +417,7 @@ function flyEmoji(emoji){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');}
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
@@ -429,6 +461,36 @@ function heartsBurst(){
     requestAnimationFrame(()=>{e.style.transform='translate('+dx+'vw,-150vh) rotate('+rot+'deg)';e.style.opacity='0';});
     setTimeout(()=>e.remove(),(dur+dl)*1000+150);
   }
+}
+
+// Odpočet do cílového času (formát cíle: "2026-09-02T12:25")
+function startCountdown(conf){
+  const parts = (conf.cil||'').match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/);
+  if(!parts){countdownWrap.style.display='none';return;}
+  const target = new Date(+parts[1], +parts[2]-1, +parts[3], +parts[4], +parts[5], 0).getTime();
+
+  function pad(n){return (n<10?'0':'')+n;}
+  function box(v,l){return '<div class="cd-box"><div class="cd-num">'+v+'</div><div class="cd-unit">'+l+'</div></div>';}
+
+  function tick(){
+    const diff = target - Date.now();
+    if(diff<=0){
+      cdBoxes.style.display='none';
+      cdDone.style.display='block';
+      cdDone.textContent = conf.hotovo_text || 'Už jsem tu ♥';
+      if(cdTimer){clearInterval(cdTimer);cdTimer=null;}
+      return;
+    }
+    cdBoxes.style.display='flex';
+    cdDone.style.display='none';
+    let s=Math.floor(diff/1000);
+    const d=Math.floor(s/86400); s-=d*86400;
+    const h=Math.floor(s/3600); s-=h*3600;
+    const m=Math.floor(s/60); s-=m*60;
+    cdBoxes.innerHTML = box(d,'dny')+box(pad(h),'hod')+box(pad(m),'min')+box(pad(s),'sek');
+  }
+  tick();
+  cdTimer = setInterval(tick,1000);
 }
 
 function updateProgress(){
