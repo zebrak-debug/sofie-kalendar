@@ -164,6 +164,8 @@
     transition:max-height .6s ease, opacity .6s ease, margin .6s ease;
   }
   .surprise-text.show{max-height:300px;opacity:1;}
+  .surprise-img{width:100%;border-radius:18px;border:1px solid #f0bccb;display:none;margin-top:16px;opacity:0;transition:opacity .6s ease;}
+  .surprise-img.show{display:block;opacity:1;}
 
   .quiz-box{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .5s ease,margin .5s ease;margin-top:0;}
   .quiz-box.show{max-height:280px;opacity:1;margin-top:10px;}
@@ -212,6 +214,7 @@
       <p class="msg" id="msg"></p>
       <button class="surprise" id="surprise" style="display:none">Překvapení ♥</button>
       <p class="surprise-text" id="surprise-text"></p>
+      <img class="surprise-img" id="surprise-img" alt="" />
 
       <button class="surprise" id="quiz-start" style="display:none">Jdu do toho!</button>
       <div id="quiz" class="quiz-box">
@@ -254,6 +257,7 @@ let SURPRISES = {};
 
 const surpriseBtn = document.getElementById('surprise');
 const surpriseText = document.getElementById('surprise-text');
+const surpriseImg = document.getElementById('surprise-img');
 let QUIZZES = {};
 const quizStart = document.getElementById('quiz-start');
 const quizBox = document.getElementById('quiz');
@@ -334,16 +338,23 @@ function openWindow(i,cell,opened){
   // Reset překvapení a nastavení, pokud pro tento den existuje
   surpriseText.classList.remove('show');
   surpriseText.textContent='';
+  surpriseImg.classList.remove('show');
+  surpriseImg.removeAttribute('src');
   const sur = SURPRISES[i+1]; // klíč v JSONu = číslo dne (1–60)
   if(sur){
     surpriseBtn.style.display='inline-block';
     surpriseBtn.textContent = sur.tlacitko || 'Překvapení ♥';
     surpriseBtn.onclick = ()=>{
       flyEmoji(sur.emoji || '🍉');
+      if(sur.foto){ flyPhotos(sur.foto); }
       setTimeout(()=>{
         surpriseText.textContent = sur.text || '';
         surpriseText.classList.add('show');
-      }, 700);
+        if(sur.foto){
+          surpriseImg.src = sur.foto;
+          surpriseImg.classList.add('show');
+        }
+      }, 800);
     };
   } else {
     surpriseBtn.style.display='none';
@@ -417,7 +428,34 @@ function flyEmoji(emoji){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
+// Malé kopie fotky, které prolétnou přes obrazovku jako polaroidy
+function flyPhotos(src){
+  const count=8;
+  for(let k=0;k<count;k++){
+    const e=document.createElement('img');
+    e.className='fly-emoji';
+    e.src=src;
+    const w=52+Math.random()*34;
+    e.style.width=w+'px';
+    e.style.height=(w*1.15)+'px';
+    e.style.objectFit='cover';
+    e.style.borderRadius='8px';
+    e.style.border='3px solid #fff';
+    e.style.boxShadow='0 6px 16px rgba(0,0,0,.25)';
+    e.style.left=(Math.random()*100)+'vw';
+    e.style.top='112vh';
+    document.body.appendChild(e);
+    const dx=(Math.random()*44-22),rot=Math.random()*640-320,dur=1.6+Math.random()*1.5,dl=Math.random()*0.6;
+    e.style.transition='transform '+dur+'s cubic-bezier(.25,.8,.3,1) '+dl+'s, opacity '+dur+'s linear '+dl+'s';
+    requestAnimationFrame(()=>{
+      e.style.transform='translate('+dx+'vw,-150vh) rotate('+rot+'deg)';
+      e.style.opacity='0';
+    });
+    setTimeout(()=>e.remove(),(dur+dl)*1000+200);
+  }
+}
+
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
