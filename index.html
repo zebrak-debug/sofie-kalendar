@@ -188,6 +188,19 @@
   .cd-unit{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px;}
   .cd-done{display:none;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:var(--rose-deep);}
 
+  .graf-wrap{margin-top:22px;}
+  .graf-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--ink);margin-top:16px;}
+  .graf-legend{display:flex;flex-direction:column;gap:8px;margin-top:14px;align-items:center;}
+  .graf-legend .row{display:flex;align-items:center;gap:8px;font-family:'Jost',sans-serif;font-size:15px;color:var(--ink);}
+  .graf-legend .dot{width:14px;height:14px;border-radius:50%;display:inline-block;}
+  .graf-legend .pct{color:var(--ink-soft);}
+
+  .slidy-wrap{margin-top:22px;}
+  .slidy-text{min-height:70px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:var(--rose-deep);transition:opacity .25s;text-align:center;}
+  .slidy-progress{font-family:'Jost',sans-serif;font-size:12px;color:var(--ink-soft);letter-spacing:.05em;margin-top:6px;}
+  .slidy-btn{margin-top:18px;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,var(--rose),var(--rose-deep));padding:13px 34px;border-radius:99px;box-shadow:0 10px 24px rgba(184,71,106,.35);transition:transform .2s;}
+  .slidy-btn:hover{transform:translateY(-2px);}
+
   .fly-emoji{position:fixed;pointer-events:none;z-index:80;will-change:transform;user-select:none;}
   .petal{position:fixed;top:-30px;font-size:18px;color:var(--rose);pointer-events:none;z-index:70;opacity:.9;will-change:transform;}
 </style>
@@ -234,6 +247,18 @@
         <div class="cd-done" id="cd-done"></div>
       </div>
 
+      <div id="graf" class="graf-wrap" style="display:none">
+        <svg id="graf-svg" viewBox="0 0 200 200" style="width:180px;height:180px;transform:rotate(-90deg)"></svg>
+        <div class="graf-title" id="graf-title"></div>
+        <div class="graf-legend" id="graf-legend"></div>
+      </div>
+
+      <div id="slidy" class="slidy-wrap" style="display:none">
+        <div class="slidy-text" id="slidy-text"></div>
+        <div class="slidy-progress" id="slidy-progress"></div>
+        <button class="slidy-btn" id="slidy-btn">Dál →</button>
+      </div>
+
       <p class="sign">— tvůj Bambínek</p>
       <button class="close" id="close">Zavřít</button>
     </div>
@@ -275,6 +300,16 @@ const countdownWrap = document.getElementById('countdown');
 const cdLabel = document.getElementById('cd-label');
 const cdBoxes = document.getElementById('cd-boxes');
 const cdDone = document.getElementById('cd-done');
+let GRAFY = {};
+let SLIDY = {};
+const grafWrap = document.getElementById('graf');
+const grafSvg = document.getElementById('graf-svg');
+const grafTitle = document.getElementById('graf-title');
+const grafLegend = document.getElementById('graf-legend');
+const slidyWrap = document.getElementById('slidy');
+const slidyText = document.getElementById('slidy-text');
+const slidyProgress = document.getElementById('slidy-progress');
+const slidyBtn = document.getElementById('slidy-btn');
 
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function todayIndex(){return Math.floor((midnight(new Date())-midnight(START_DATE))/86400000);}
@@ -293,6 +328,8 @@ fetch('hlasky.json?v='+Date.now())
     SURPRISES=data.prekvapeni||{};
     QUIZZES=data.kvizy||{};
     COUNTDOWNS=data.odpocty||{};
+    GRAFY=data.grafy||{};
+    SLIDY=data.slidy||{};
     build();
   })
   .catch(err=>{
@@ -395,6 +432,24 @@ function openWindow(i,cell,opened){
     countdownWrap.style.display='none';
   }
 
+  // Graf, pokud pro tento den existuje
+  const grafConf = GRAFY[i+1];
+  if(grafConf){
+    grafWrap.style.display='block';
+    renderGraf(grafConf);
+  } else {
+    grafWrap.style.display='none';
+  }
+
+  // Slidy, pokud pro tento den existují
+  const slidyConf = SLIDY[i+1];
+  if(slidyConf){
+    slidyWrap.style.display='block';
+    startSlidy(slidyConf);
+  } else {
+    slidyWrap.style.display='none';
+  }
+
   overlay.classList.add('show');
   if(!opened.includes(i)){
     opened.push(i);setOpened(opened);
@@ -455,7 +510,7 @@ function flyPhotos(src){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
@@ -530,6 +585,52 @@ function startCountdown(conf){
   tick();
   cdTimer = setInterval(tick,1000);
 }
+
+// Koláčový graf: conf = { titulek, casti:[{popisek, hodnota, barva}, ...] }
+function renderGraf(conf){
+  const casti = conf.casti || [];
+  const total = casti.reduce((s,c)=>s+(c.hodnota||0),0) || 1;
+  const R=80, C=2*Math.PI*R;
+  let offset=0;
+  let svg='';
+  casti.forEach(c=>{
+    const frac=(c.hodnota||0)/total;
+    const len=frac*C;
+    svg+='<circle cx="100" cy="100" r="'+R+'" fill="none" stroke="'+(c.barva||'#e26d8a')+'" stroke-width="40" stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-offset)+'"></circle>';
+    offset+=len;
+  });
+  grafSvg.innerHTML=svg;
+  grafTitle.textContent=conf.titulek||'';
+  let leg='';
+  casti.forEach(c=>{
+    leg+='<div class="row"><span class="dot" style="background:'+(c.barva||'#e26d8a')+'"></span> '+(c.popisek||'')+' <span class="pct">('+(c.hodnota||0)+' %)</span></div>';
+  });
+  grafLegend.innerHTML=leg;
+}
+
+// Proklikávací slidy: conf = { casti:[...] }
+let slidyState={list:[],idx:0};
+function startSlidy(conf){
+  slidyState.list = conf.casti || [];
+  slidyState.idx = 0;
+  renderSlide();
+}
+function renderSlide(){
+  const list=slidyState.list;
+  if(!list.length) return;
+  slidyText.style.opacity='0';
+  setTimeout(()=>{
+    slidyText.textContent=list[slidyState.idx];
+    slidyProgress.textContent=(slidyState.idx+1)+' / '+list.length;
+    slidyText.style.opacity='1';
+    slidyBtn.textContent = (slidyState.idx===list.length-1) ? 'Znovu ↺' : 'Dál →';
+  },200);
+}
+slidyBtn.addEventListener('click',()=>{
+  if(slidyState.idx>=slidyState.list.length-1){slidyState.idx=0;}
+  else{slidyState.idx++;}
+  renderSlide();
+});
 
 function updateProgress(){
   const n=getOpened().length;

@@ -40,20 +40,46 @@
     "Přiznávám: půlku času přemýšlím o tvém bříšku a druhou půlku o tvým zadku. A upřímně, nemá to vítěze.",
     "Vzbuď se a koukni se ven, je ráno, je ráno Anno, vzbuď se a koukni se ven. Takhle šťastné to dneska asi nebude, ale nesmíme zapomínat na to, že máme před sebou celých 6 let (možná více). Další měsíc zvládneme.",
     "Neplakej moje překrásná holčičko, za chvíli se zase uvidíme a budeme spolu dělat všechny ty věci, o kterých už zase sníme. Miluju tě.",
-    "Dnes je mezinárodní den polibku. Snad si jich spolu ještě užijeme mraky. A upusinkujeme se k smrti."
+    "Dnes je mezinárodní den polibku. Snad si jich spolu ještě užijeme mraky. A upusinkujeme se k smrti.",
+    "Chci, ať víš. Že ať už jsi oblečená nebo nahá, namalovaná nebo ne, usměvavá nebo uplakaná, šťastná nebo smutná. Pořád jsi moje krásná holka.",
+    "Nejsem Patrick Jane, ale mám takový pocit, že je mezi náma dost podezřelá chemie.",
+    "Moje mysl:",
+    "Ty budeš moje Ariana Grande a já tvůj Mac Miller, jen se nerozejdeme a nikdo neumře. Jupíííí.",
+    "Myslím, že bys už nikdy neměla chodit na letiště, protože seš bomba!",
+    "Já tě chci vážně moc obejmout, ale seš tak moc daleko."
   ],
   "prekvapeni": {
-    "3": { "emoji": "🍉", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den melounu. Ty jsi šťavnatá jako ten nejsladší meloun." },
-    "8": { "emoji": "🐱", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den koček, ale tu největší kočičku mám já!" },
-    "27": { "emoji": "🌊", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den jezer. Těším se až budeš mokrá tak, že budu v tobě plavat jako v jezeru." },
-    "40": { "emoji": "💋", "tlacitko": "Překvapení ♥", "text": "Dnes je mezinárodní den polibku. Snad si jich spolu ještě užijeme mraky. A upusinkujeme se k smrti.", "foto": "foto-den40.jpg" }
+    "3": {
+      "emoji": "🍉",
+      "tlacitko": "Překvapení ♥",
+      "text": "Dnes je mezinárodní den melounu. Ty jsi šťavnatá jako ten nejsladší meloun."
+    },
+    "8": {
+      "emoji": "🐱",
+      "tlacitko": "Překvapení ♥",
+      "text": "Dnes je mezinárodní den koček, ale tu největší kočičku mám já!"
+    },
+    "27": {
+      "emoji": "🌊",
+      "tlacitko": "Překvapení ♥",
+      "text": "Dnes je mezinárodní den jezer. Těším se až budeš mokrá tak, že budu v tobě plavat jako v jezeru."
+    },
+    "40": {
+      "emoji": "💋",
+      "tlacitko": "Překvapení ♥",
+      "text": "Dnes je mezinárodní den polibku. Snad si jich spolu ještě užijeme mraky. A upusinkujeme se k smrti.",
+      "foto": "foto-den40.jpg"
+    }
   },
   "kvizy": {
     "22": {
       "tlacitko": "Jdu do toho!",
       "otazka": "Kdy jsem se narodil?",
       "napoveda": "např. 3.5.2002",
-      "spravne": ["22.3.2000", "22032000"],
+      "spravne": [
+        "22.3.2000",
+        "22032000"
+      ],
       "spravne_hlaska": "Správně! ♥",
       "spatne_hlaska": "Skoro... zkus to znovu ♥",
       "foto": "foto-den22.jpg",
@@ -61,8 +87,56 @@
     }
   },
   "odpocty": {
-    "31": { "cil": "2026-09-02T12:25", "popisek": "Než za tebou přijedu", "hotovo_text": "Už jsem tu ♥" },
-    "32": { "cil": "2026-09-02T12:25", "popisek": "Než za tebou přijedu", "hotovo_text": "Už jsem tu ♥" },
-    "33": { "cil": "2026-09-02T12:25", "popisek": "Než za tebou přijedu", "hotovo_text": "Už jsem tu ♥" }
+    "31": {
+      "cil": "2026-09-02T12:25",
+      "popisek": "Než za tebou přijedu",
+      "hotovo_text": "Už jsem tu ♥"
+    },
+    "32": {
+      "cil": "2026-09-02T12:25",
+      "popisek": "Než za tebou přijedu",
+      "hotovo_text": "Už jsem tu ♥"
+    },
+    "33": {
+      "cil": "2026-09-02T12:25",
+      "popisek": "Než za tebou přijedu",
+      "hotovo_text": "Už jsem tu ♥"
+    }
+  },
+  "grafy": {
+    "43": {
+      "titulek": "Moje mysl",
+      "casti": [
+        {
+          "popisek": "Ty",
+          "hodnota": 10,
+          "barva": "#43c06d"
+        },
+        {
+          "popisek": "Ty bez oblečení",
+          "hodnota": 90,
+          "barva": "#5b8def"
+        }
+      ]
+    }
+  },
+  "slidy": {
+    "46": {
+      "casti": [
+        "Já",
+        "tě chci",
+        "vááá",
+        "áááááá",
+        "žně",
+        "moc obejmout",
+        "ale seš",
+        "tak",
+        "moooo",
+        "oooo",
+        "oooo",
+        "ooc",
+        "daleko"
+      ]
+    }
   }
 }
