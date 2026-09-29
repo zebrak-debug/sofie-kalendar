@@ -620,7 +620,21 @@ function renderSlide(){
   if(!list.length) return;
   slidyText.style.opacity='0';
   setTimeout(()=>{
-    slidyText.textContent=list[slidyState.idx];
+    const part = list[slidyState.idx];
+    if(part && typeof part === 'object' && part.seznam){
+      // scrollovací číslovaný seznam
+      let html='<div style="text-align:left;max-height:280px;overflow-y:auto;padding:4px 8px;font-family:\'Jost\',sans-serif;font-size:15px;line-height:1.7;color:var(--ink);">';
+      part.seznam.forEach((item,k)=>{
+        const safe=String(item).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        html+='<div style="margin-bottom:3px;"><span style="color:var(--rose-deep);font-weight:600;">'+(k+1)+'.</span> '+safe+'</div>';
+      });
+      html+='</div>';
+      slidyText.innerHTML=html;
+      slidyText.style.fontSize='';
+    } else {
+      slidyText.textContent = part;
+      slidyText.style.fontSize='';
+    }
     slidyProgress.textContent=(slidyState.idx+1)+' / '+list.length;
     slidyText.style.opacity='1';
     slidyBtn.textContent = (slidyState.idx===list.length-1) ? 'Znovu ↺' : 'Dál →';
