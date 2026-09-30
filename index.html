@@ -270,8 +270,6 @@
       <div id="finale" class="finale-wrap" style="display:none">
         <div class="finale-content" id="finale-content"></div>
         <button class="finale-btn" id="finale-btn">Dál →</button>
-        <button class="finale-btn" id="game-open-btn" style="display:none;margin-top:10px">Hrát ♥</button>
-        <div class="game-hint" id="game-hint" style="display:none;font-family:'Jost',sans-serif;font-size:13px;color:var(--ink-soft);margin-top:8px;">aby ses nenudila v autě</div>
       </div>
 
       <div id="game-wrap" style="display:none;margin-top:8px">
@@ -550,7 +548,7 @@ function flyPhotos(src){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';finaleWrap.style.display='none';gameWrap.style.display='none';document.getElementById('game-open-btn').style.display='none';document.getElementById('game-hint').style.display='none';gst.run=false;if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';finaleWrap.style.display='none';gameWrap.style.display='none';gst.run=false;if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
@@ -695,20 +693,31 @@ function startFinale(conf){
 function renderFinale(){
   const steps=finaleState.steps;
   if(!steps.length) return;
+  const isLast = finaleState.idx >= steps.length-1;
   finaleContent.style.opacity='0';
   setTimeout(()=>{
     const step=steps[finaleState.idx];
-    if(step.typ==='foto'){
+    // reset herního bloku při každém kroku
+    gameWrap.style.display='none';
+    if(step.typ==='hra'){
+      // samostatné okno: jen hra
+      finaleContent.innerHTML='';
+      finaleBtn.style.display='none';
+      gameWrap.style.display='block';
+      gMsg.textContent='Chytej moje hlavy do svojí pusy! ♥';
+      gStart.textContent='Start ♥'; gStart.style.display='inline-block';
+      gScore.textContent=0; gLives.innerHTML='❤❤❤';
+      initGameImgs();
+      // vykreslit úvodní stav
+      setTimeout(()=>{gDraw();},60);
+    } else if(step.typ==='foto'){
       let html='';
       if(step.foto){ html+='<img class="fimg" src="'+step.foto+'" alt="">'; }
       if(step.zaver){ html+='<div class="fzaver">'+step.zaver+'</div>'; }
       finaleContent.innerHTML=html;
-      finaleBtn.style.display='none';
       heartsBurst();
-      if(step.hra){
-        document.getElementById('game-open-btn').style.display='inline-block';
-        document.getElementById('game-hint').style.display='block';
-      }
+      finaleBtn.style.display = isLast ? 'none' : 'inline-block';
+      finaleBtn.textContent = step.tlacitko || 'Dál →';
     } else {
       const size = step.velikost || 20;
       finaleContent.innerHTML='<div class="ftext" style="font-size:'+size+'px">'+step.text+'</div>';
@@ -733,16 +742,7 @@ const gScore = document.getElementById('g-score');
 const gLives = document.getElementById('g-lives');
 const gMsg = document.getElementById('g-msg');
 const gStart = document.getElementById('g-start');
-const gameOpenBtn = document.getElementById('game-open-btn');
 let gImgs={dobra:null,hrackyni:null,spatna:null,okD:false,okH:false,okS:false};
-
-gameOpenBtn.addEventListener('click',()=>{
-  gameWrap.style.display='block';
-  gameOpenBtn.style.display='none';
-  document.getElementById('game-hint').style.display='none';
-  initGameImgs();
-  gameWrap.scrollIntoView({behavior:'smooth',block:'center'});
-});
 
 function initGameImgs(){
   if(!GAMECFG) return;

@@ -1,5 +1,5 @@
 {
-  "start_date": "2026-07-01",
+  "start_date": "2026-08-01",
   "hlasky": [
     "Ráno se probouzím a první myšlenka jsi ty. Vždycky.",
     "Máš úsměv, kterým bys dokázala rozsvítit i ten nejšedivější den.",
@@ -268,8 +268,10 @@
         {
           "typ": "foto",
           "foto": "foto-den62.jpg",
-          "zaver": "Vítej doma. Konečně spolu!",
-          "hra": true
+          "zaver": "Vítej doma. Konečně spolu!"
+        },
+        {
+          "typ": "hra"
         }
       ]
     }
