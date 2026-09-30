@@ -201,6 +201,14 @@
   .slidy-btn{margin-top:18px;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,var(--rose),var(--rose-deep));padding:13px 34px;border-radius:99px;box-shadow:0 10px 24px rgba(184,71,106,.35);transition:transform .2s;}
   .slidy-btn:hover{transform:translateY(-2px);}
 
+  .finale-wrap{margin-top:8px;}
+  .finale-content{transition:opacity .3s;}
+  .finale-content .ftext{font-family:'Cormorant Garamond',serif;font-weight:500;line-height:1.45;color:var(--ink);}
+  .finale-content .fimg{width:100%;border-radius:18px;border:1px solid #f0bccb;display:block;}
+  .finale-content .fzaver{font-family:'Cormorant Garamond',serif;font-weight:600;font-style:italic;font-size:clamp(24px,5vw,30px);color:var(--rose-deep);margin-top:20px;line-height:1.3;}
+  .finale-btn{margin-top:18px;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,var(--rose),var(--rose-deep));padding:13px 32px;border-radius:99px;box-shadow:0 10px 24px rgba(184,71,106,.35);transition:transform .2s;}
+  .finale-btn:hover{transform:translateY(-2px);}
+
   .fly-emoji{position:fixed;pointer-events:none;z-index:80;will-change:transform;user-select:none;}
   .petal{position:fixed;top:-30px;font-size:18px;color:var(--rose);pointer-events:none;z-index:70;opacity:.9;will-change:transform;}
 </style>
@@ -259,6 +267,11 @@
         <button class="slidy-btn" id="slidy-btn">Dál →</button>
       </div>
 
+      <div id="finale" class="finale-wrap" style="display:none">
+        <div class="finale-content" id="finale-content"></div>
+        <button class="finale-btn" id="finale-btn">Dál →</button>
+      </div>
+
       <p class="sign">— tvůj Bambínek</p>
       <button class="close" id="close">Zavřít</button>
     </div>
@@ -310,6 +323,11 @@ const slidyWrap = document.getElementById('slidy');
 const slidyText = document.getElementById('slidy-text');
 const slidyProgress = document.getElementById('slidy-progress');
 const slidyBtn = document.getElementById('slidy-btn');
+let FINALE = {};
+const finaleWrap = document.getElementById('finale');
+const finaleContent = document.getElementById('finale-content');
+const finaleBtn = document.getElementById('finale-btn');
+let finaleState = {steps:[], idx:0};
 
 function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function todayIndex(){return Math.floor((midnight(new Date())-midnight(START_DATE))/86400000);}
@@ -330,6 +348,7 @@ fetch('hlasky.json?v='+Date.now())
     COUNTDOWNS=data.odpocty||{};
     GRAFY=data.grafy||{};
     SLIDY=data.slidy||{};
+    FINALE=data.finale||{};
     build();
   })
   .catch(err=>{
@@ -450,6 +469,15 @@ function openWindow(i,cell,opened){
     slidyWrap.style.display='none';
   }
 
+  // Finále (vícekrokové), pokud pro tento den existuje
+  const finaleConf = FINALE[i+1];
+  if(finaleConf){
+    finaleWrap.style.display='block';
+    startFinale(finaleConf);
+  } else {
+    finaleWrap.style.display='none';
+  }
+
   overlay.classList.add('show');
   if(!opened.includes(i)){
     opened.push(i);setOpened(opened);
@@ -510,7 +538,7 @@ function flyPhotos(src){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';finaleWrap.style.display='none';if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
@@ -644,6 +672,41 @@ slidyBtn.addEventListener('click',()=>{
   if(slidyState.idx>=slidyState.list.length-1){slidyState.idx=0;}
   else{slidyState.idx++;}
   renderSlide();
+});
+
+// Vícekrokové finále: conf = { kroky:[{typ:'text',text,tlacitko?}, {typ:'foto',foto,zaver}] }
+function startFinale(conf){
+  finaleState.steps = conf.kroky || [];
+  finaleState.idx = 0;
+  renderFinale();
+}
+function renderFinale(){
+  const steps=finaleState.steps;
+  if(!steps.length) return;
+  finaleContent.style.opacity='0';
+  setTimeout(()=>{
+    const step=steps[finaleState.idx];
+    if(step.typ==='foto'){
+      let html='';
+      if(step.foto){ html+='<img class="fimg" src="'+step.foto+'" alt="">'; }
+      if(step.zaver){ html+='<div class="fzaver">'+step.zaver+'</div>'; }
+      finaleContent.innerHTML=html;
+      finaleBtn.style.display='none';
+      heartsBurst();
+    } else {
+      const size = step.velikost || 20;
+      finaleContent.innerHTML='<div class="ftext" style="font-size:'+size+'px">'+step.text+'</div>';
+      finaleBtn.style.display='inline-block';
+      finaleBtn.textContent = step.tlacitko || 'Dál →';
+    }
+    finaleContent.style.opacity='1';
+  },250);
+}
+finaleBtn.addEventListener('click',()=>{
+  if(finaleState.idx < finaleState.steps.length-1){
+    finaleState.idx++;
+    renderFinale();
+  }
 });
 
 function updateProgress(){

@@ -61,7 +61,8 @@
     "Když mi posíláš fotky, začínám přemýšlet, jestli chodím s modelkou, andělem, nebo mám jen takové štěstí.",
     "Kvůli tobě se mi změnil Instagram jen na příspěvky o lásce. A občas nějaké čůzy, ale to je tím, jaké prasácké myšlenky mám, když na tebe myslím.",
     "Už se cítím, jako by na mě někdo nalil Pepo a škrtnul sirkou, protože hořím touhou tě vidět a mít tě u sebe!",
-    "Tři věci, které po tobě chci…"
+    "Tři věci, které po tobě chci…",
+    "A jsme na konci…"
   ],
   "prekvapeni": {
     "3": {
@@ -241,6 +242,33 @@
             "Tvoje sny o nás.",
             "Tvůj respekt i ve chvílích, kdy se neshodneme."
           ]
+        }
+      ]
+    }
+  },
+  "finale": {
+    "62": {
+      "kroky": [
+        {
+          "typ": "text",
+          "velikost": 19,
+          "text": "To bylo 62 dnů, 62 okének, 62 důvodů, 62 rán, kdy jsi mi chyběla. A víš co? Zvládl jsem to. Zvládla jsi to. Zvládli jsme to. Tohle je poslední okénko, protože další „hlášku\" ti už řeknu naživo do očí a s tebou v mém náručí."
+        },
+        {
+          "typ": "text",
+          "velikost": 28,
+          "text": "Kecám, ještě pro tebe dneska něco mám!"
+        },
+        {
+          "typ": "text",
+          "velikost": 18,
+          "text": "„Tři\" věci, které po tobě chci už víš. Ale taky chci, aby ses vedle mě cítila v bezpečí a milována. Chci dělat tvůj svět šťastnějším, vážit si každého společného okamžiku a dávat ti lásku, jakou si zasloužíš. Chci tě mít ve svém životě… napořád? Vím, že to nemáš ráda, tak alespoň na hodně dlouho. Miluju tě!",
+          "tlacitko": "Otevřít poslední překvapení ♥"
+        },
+        {
+          "typ": "foto",
+          "foto": "foto-den62.jpg",
+          "zaver": "Vítej doma. Konečně spolu!"
         }
       ]
     }
