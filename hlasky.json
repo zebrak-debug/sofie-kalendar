@@ -268,9 +268,17 @@
         {
           "typ": "foto",
           "foto": "foto-den62.jpg",
-          "zaver": "Vítej doma. Konečně spolu!"
+          "zaver": "Vítej doma. Konečně spolu!",
+          "hra": true
         }
       ]
     }
+  },
+  "hra": {
+    "dobra": "hra-jan.png",
+    "hrackyni": "hra-sofie.png",
+    "spatna": "hra-spatna.png",
+    "cil": 50,
+    "vyhra_text": "Dost bylo hraní, už se mi vrať. ♥"
   }
 }

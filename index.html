@@ -270,6 +270,17 @@
       <div id="finale" class="finale-wrap" style="display:none">
         <div class="finale-content" id="finale-content"></div>
         <button class="finale-btn" id="finale-btn">Dál →</button>
+        <button class="finale-btn" id="game-open-btn" style="display:none;margin-top:10px">Hrát ♥</button>
+        <div class="game-hint" id="game-hint" style="display:none;font-family:'Jost',sans-serif;font-size:13px;color:var(--ink-soft);margin-top:8px;">aby ses nenudila v autě</div>
+      </div>
+
+      <div id="game-wrap" style="display:none;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;font-family:'Jost',sans-serif;font-size:14px;color:var(--ink);margin-bottom:8px;padding:0 4px;">
+          <span>Skóre: <b id="g-score">0</b> / 50</span><span id="g-lives">❤❤❤</span>
+        </div>
+        <canvas id="g-canvas" width="340" height="380" style="width:100%;border-radius:16px;background:linear-gradient(180deg,#fff,#ffeaf1);border:1px solid #f3c9d6;touch-action:none;display:block;cursor:pointer;"></canvas>
+        <div id="g-msg" style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--rose-deep);margin-top:10px;min-height:22px;">Chytej moje hlavy do svojí pusy! ♥</div>
+        <button class="finale-btn" id="g-start" style="margin-top:10px">Start ♥</button>
       </div>
 
       <p class="sign">— tvůj Bambínek</p>
@@ -349,6 +360,7 @@ fetch('hlasky.json?v='+Date.now())
     GRAFY=data.grafy||{};
     SLIDY=data.slidy||{};
     FINALE=data.finale||{};
+    GAMECFG=data.hra||null;
     build();
   })
   .catch(err=>{
@@ -538,7 +550,7 @@ function flyPhotos(src){
   }
 }
 
-function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';finaleWrap.style.display='none';if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
+function closeOverlay(){overlay.classList.remove('show');surpriseText.classList.remove('show');surpriseImg.classList.remove('show');quizBox.classList.remove('show');quizReward.classList.remove('show');grafWrap.style.display='none';slidyWrap.style.display='none';finaleWrap.style.display='none';gameWrap.style.display='none';document.getElementById('game-open-btn').style.display='none';document.getElementById('game-hint').style.display='none';gst.run=false;if(cdTimer){clearInterval(cdTimer);cdTimer=null;}}
 document.getElementById('close').addEventListener('click',closeOverlay);
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
@@ -693,6 +705,10 @@ function renderFinale(){
       finaleContent.innerHTML=html;
       finaleBtn.style.display='none';
       heartsBurst();
+      if(step.hra){
+        document.getElementById('game-open-btn').style.display='inline-block';
+        document.getElementById('game-hint').style.display='block';
+      }
     } else {
       const size = step.velikost || 20;
       finaleContent.innerHTML='<div class="ftext" style="font-size:'+size+'px">'+step.text+'</div>';
@@ -708,6 +724,88 @@ finaleBtn.addEventListener('click',()=>{
     renderFinale();
   }
 });
+
+// ---- Hra: chytej hlavy ----
+let GAMECFG = null; // {dobra, hrackyni, spatna, cil, vyhra_text}
+const gameWrap = document.getElementById('game-wrap');
+const gCanvas = document.getElementById('g-canvas');
+const gScore = document.getElementById('g-score');
+const gLives = document.getElementById('g-lives');
+const gMsg = document.getElementById('g-msg');
+const gStart = document.getElementById('g-start');
+const gameOpenBtn = document.getElementById('game-open-btn');
+let gImgs={dobra:null,hrackyni:null,spatna:null,okD:false,okH:false,okS:false};
+
+gameOpenBtn.addEventListener('click',()=>{
+  gameWrap.style.display='block';
+  gameOpenBtn.style.display='none';
+  document.getElementById('game-hint').style.display='none';
+  initGameImgs();
+  gameWrap.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
+function initGameImgs(){
+  if(!GAMECFG) return;
+  if(!gImgs.dobra){
+    gImgs.dobra=new Image(); gImgs.dobra.onload=()=>{gImgs.okD=true;}; gImgs.dobra.src=GAMECFG.dobra;
+    gImgs.hrackyni=new Image(); gImgs.hrackyni.onload=()=>{gImgs.okH=true;}; gImgs.hrackyni.src=GAMECFG.hrackyni;
+    gImgs.spatna=new Image(); gImgs.spatna.onload=()=>{gImgs.okS=true;}; gImgs.spatna.src=GAMECFG.spatna;
+  }
+}
+
+const gctx=gCanvas.getContext('2d');
+const GW=gCanvas.width, GH=gCanvas.height;
+const pw=48,ph=60,sw=60,sh=72;
+let gst={run:false,score:0,lives:3,px:GW/2,heads:[],spawn:0,speed:2.2};
+
+function gReset(){
+  const cil=(GAMECFG&&GAMECFG.cil)||50;
+  gst={run:true,score:0,lives:3,px:GW/2,heads:[],spawn:0,speed:2.2};
+  gScore.textContent=0; gLives.innerHTML='❤❤❤'; gMsg.textContent='Chytej! ♥'; gStart.style.display='none';
+  gLoop();
+}
+function gSpawn(){
+  // 1 spatna na cca 6 dobrych
+  const bad = Math.random()<0.16;
+  gst.heads.push({x:20+Math.random()*(GW-40-pw),y:-ph,vy:gst.speed+Math.random()*1.3,bad:bad});
+}
+function gDrawHead(h){
+  if(h.bad){ if(gImgs.okS){gctx.drawImage(gImgs.spatna,h.x,h.y,pw,ph);} else {gctx.fillStyle='#b33';gctx.beginPath();gctx.ellipse(h.x+pw/2,h.y+ph/2,pw/2,ph/2,0,0,7);gctx.fill();} }
+  else { if(gImgs.okD){gctx.drawImage(gImgs.dobra,h.x,h.y,pw,ph);} else {gctx.fillStyle='#7fa8d8';gctx.beginPath();gctx.ellipse(h.x+pw/2,h.y+ph/2,pw/2,ph/2,0,0,7);gctx.fill();} }
+}
+function gDrawSofie(){ var x=gst.px-sw/2,y=GH-sh; if(gImgs.okH){gctx.drawImage(gImgs.hrackyni,x,y,sw,sh);} else {gctx.fillStyle='#e26d8a';gctx.beginPath();gctx.ellipse(gst.px,GH-sh/2,sw/2,sh/2,0,0,7);gctx.fill();} }
+function gUpdate(){
+  const cil=(GAMECFG&&GAMECFG.cil)||50;
+  gst.spawn++; if(gst.spawn>66){gst.spawn=0;gSpawn();}
+  for(var i=gst.heads.length-1;i>=0;i--){var h=gst.heads[i];h.y+=h.vy;
+    var caught=(h.y+ph>GH-sh+16)&&(h.x+pw>gst.px-sw/2+8)&&(h.x<gst.px+sw/2-8)&&(h.y<GH-4);
+    if(caught){
+      gst.heads.splice(i,1);
+      if(h.bad){ gBadCatch(); return; }
+      gst.score++; gScore.textContent=gst.score;
+      if(gst.score%5===0)gst.speed+=0.3;
+      if(gst.score>=cil){ gWin(); return; }
+      continue;
+    }
+    if(h.y>GH){gst.heads.splice(i,1);
+      if(!h.bad){ gst.lives--; gLives.innerHTML='❤'.repeat(Math.max(0,gst.lives))+'♡'.repeat(3-Math.max(0,gst.lives)); if(gst.lives<=0){gOver();return;} }
+    }
+  }
+}
+function gDraw(){gctx.clearRect(0,0,GW,GH);for(var i=0;i<gst.heads.length;i++)gDrawHead(gst.heads[i]);gDrawSofie();}
+function gLoop(){if(!gst.run)return;gUpdate();if(!gst.run)return;gDraw();requestAnimationFrame(gLoop);}
+function gWin(){gst.run=false;gDraw();gctx.fillStyle='rgba(226,109,138,.93)';gctx.fillRect(0,GH/2-58,GW,116);gctx.fillStyle='#fff';gctx.textAlign='center';gctx.font='bold 20px Georgia';
+  var t=(GAMECFG&&GAMECFG.vyhra_text)||'Dost bylo hraní, už se mi vrať. ♥'; var parts=t.split(', '); 
+  if(parts.length>1){gctx.fillText(parts[0]+',',GW/2,GH/2-6);gctx.fillText(parts.slice(1).join(', '),GW/2,GH/2+24);}else{gctx.fillText(t,GW/2,GH/2+7);}
+  gMsg.textContent='Výhra! ♥';gStart.textContent='Hrát znovu ♥';gStart.style.display='inline-block';}
+function gBadCatch(){gst.run=false;gDraw();gctx.fillStyle='rgba(74,39,51,.9)';gctx.fillRect(0,GH/2-46,GW,92);gctx.fillStyle='#fff';gctx.textAlign='center';gctx.font='bold 22px Georgia';gctx.fillText('Špatná hlava =',GW/2,GH/2-4);gctx.fillText('Game Over',GW/2,GH/2+26);
+  gMsg.textContent='Chytila jsi špatnou hlavu! ♥';gStart.textContent='Hrát znovu ♥';gStart.style.display='inline-block';}
+function gOver(){gst.run=false;gDraw();gctx.fillStyle='rgba(74,39,51,.85)';gctx.fillRect(0,GH/2-40,GW,80);gctx.fillStyle='#fff';gctx.textAlign='center';gctx.font='bold 20px Georgia';gctx.fillText('Skóre: '+gst.score,GW/2,GH/2+7);
+  gMsg.textContent='Zkus to znovu ♥';gStart.textContent='Hrát znovu ♥';gStart.style.display='inline-block';}
+function gMove(cx){var r=gCanvas.getBoundingClientRect();var x=(cx-r.left)*(GW/r.width);gst.px=Math.max(sw/2,Math.min(GW-sw/2,x));if(!gst.run)gDraw();}
+gCanvas.addEventListener('mousemove',function(e){gMove(e.clientX);});
+gCanvas.addEventListener('touchmove',function(e){e.preventDefault();gMove(e.touches[0].clientX);},{passive:false});
+gStart.addEventListener('click',gReset);
 
 function updateProgress(){
   const n=getOpened().length;
